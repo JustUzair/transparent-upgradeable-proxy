@@ -7,6 +7,9 @@ import {UpgradeBox} from "../script/UpgradeBox.s.sol";
 import {Test, console} from "forge-std/Test.sol";
 import {StdCheats} from "forge-std/StdCheats.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
+
 import {BoxV1} from "../src/BoxV1.sol";
 import {BoxV2} from "../src/BoxV2.sol";
 
@@ -21,20 +24,20 @@ contract DeployAndUpgradeTest is StdCheats, Test {
     }
 
     function testBoxWorks() public {
-        address proxyAddress = deployBox.deployBox();
+        (address proxyAddress, address proxyAdminAddress) = deployBox.deployBox();
         uint256 expectedValue = 1;
         assertEq(expectedValue, BoxV1(proxyAddress).version());
     }
 
     function testDeploymentIsV1() public {
-        address proxyAddress = deployBox.deployBox();
+        (address proxyAddress, address proxyAdminAddress) = deployBox.deployBox();
         uint256 expectedValue = 7;
         vm.expectRevert();
         BoxV2(proxyAddress).setValue(expectedValue);
     }
 
     function testUpgradeWorks() public {
-        address proxyAddress = deployBox.deployBox();
+        (address proxyAddress, address proxyAdminAddress) = deployBox.deployBox();
 
         BoxV2 box2 = new BoxV2();
 

@@ -6,16 +6,19 @@ import {BoxV1} from "../src/BoxV1.sol";
 import {BoxV2} from "../src/BoxV2.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {DevOpsTools} from "lib/foundry-devops/src/DevOpsTools.sol";
+import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 
 contract UpgradeBox is Script {
     function run() external returns (address) {
-        // address mostRecentlyDeployedProxy = DevOpsTools.get_most_recent_deployment("ERC1967Proxy", block.chainid);
+        address mostRecentlyDeployedProxy =
+            DevOpsTools.get_most_recent_deployment("TransparentUpgradeableProxy", block.chainid);
 
         vm.startBroadcast();
         BoxV2 newBox = new BoxV2();
         vm.stopBroadcast();
-        // address of proxy contract for box v1 : 0x14453Dc5d6d10BC7c9D8b22Ac8814Ec14E73a00e
-        address proxy = upgradeBox(0x14453Dc5d6d10BC7c9D8b22Ac8814Ec14E73a00e, address(newBox));
+        // address of proxy contract for box v1 : 0x7EcEb12Ce99A1E585cc0AB408da4d76197Ca7639
+        address proxy = upgradeBox(mostRecentlyDeployedProxy, address(newBox));
         return proxy;
     }
 
